@@ -29,10 +29,10 @@ elementLimit = ceil((n/(numCellsRow*numCellsCol))*1.1);
 
 for idx = 1:n
     theta1rand = (theta1high-theta1low).*rand(1,1);
-    theta2rand = theta2low + (theta2high-theta2low).*rand(1,1);
+    theta2rand = -theta2low + (theta2high-theta2low).*rand(1,1);
     theta1Index = ceil(theta1rand/deltaTheta);
     theta2Index = ceil(theta2rand/deltaTheta);%this could end up being a negative number.... then it would not pull correctly from
-    thetaCountCell(theta1Index,theta2Index+9) = thetaCountCell(theta1Index,theta2Index+9) + 1; %here...
+    thetaCountCell(theta1Index,theta2Index) = thetaCountCell(theta1Index,theta2Index) + 1; %here...
     %use element limit and if statement here! 
 end
 
