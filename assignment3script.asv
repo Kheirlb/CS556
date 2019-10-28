@@ -13,7 +13,7 @@ robfk = rob.fkine([theta1 theta2])
 xEq = robfk.t(1,1);
 yEq = robfk.t(2,1);
 
-%% Constraints & Initialization
+%% Constraints
 n = 25000;
 
 theta1low = 0;
