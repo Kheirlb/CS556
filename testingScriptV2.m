@@ -45,7 +45,7 @@ yVar2 = [];
 for testi = 1:testSize
     x = xTestVec(testi);
     y = yTestVec(testi);
-    try
+   try
         thetas{testi,1} = [x,y];
         thetasIk = customIk(x,y);
         thetasIkClosed = closedIk(x,y,l1,l2);
@@ -57,15 +57,6 @@ for testi = 1:testSize
         yUsed = [yUsed, y];
         %compare variance here!!!
         
-        if length(thetasIkClosed) > 0
-            xVar2 = [xVar2, 100*cosd(thetasIkClosed(1) + thetasIkClosed(2)) + 100*cosd(thetasIkClosed(1))];
-            yVar2 = [yVar2, 100*sind(thetasIkClosed(1) + thetasIkClosed(2)) + 100*sind(thetasIkClosed(1))];
-        end
-        if length(thetasIkClosed) > 2
-            xVar2 = [xVar2, 100*cosd(thetasIkClosed(3) + thetasIkClosed(4)) + 100*cosd(thetasIkClosed(3))];
-            yVar2 = [yVar2, 100*sind(thetasIkClosed(3) + thetasIkClosed(4)) + 100*sind(thetasIkClosed(3))];
-        end
-        
         if length(thetasIk) > 0
             xVar = [xVar, 100*cosd(thetasIk(1) + thetasIk(2)) + 100*cosd(thetasIk(1))];
             yVar = [yVar, 100*sind(thetasIk(1) + thetasIk(2)) + 100*sind(thetasIk(1))];
@@ -74,10 +65,19 @@ for testi = 1:testSize
             xVar = [xVar, 100*cosd(thetasIk(3) + thetasIk(4)) + 100*cosd(thetasIk(3))];
             yVar = [yVar, 100*sind(thetasIk(3) + thetasIk(4)) + 100*sind(thetasIk(3))];
         end        
-    catch
+        
+        if length(thetasIkClosed) > 0
+            xVar2 = [xVar2, 100*cosd(thetasIkClosed(1) + thetasIkClosed(2)) + 100*cosd(thetasIkClosed(1))];
+            yVar2 = [yVar2, 100*sind(thetasIkClosed(1) + thetasIkClosed(2)) + 100*sind(thetasIkClosed(1))];
+        end
+        if length(thetasIkClosed) > 2
+            xVar2 = [xVar2, 100*cosd(thetasIkClosed(3) + thetasIkClosed(4)) + 100*cosd(thetasIkClosed(3))];
+            yVar2 = [yVar2, 100*sind(thetasIkClosed(3) + thetasIkClosed(4)) + 100*sind(thetasIkClosed(3))];
+        end
+   catch
         %catch if not in workspace
-        didNotWork = didNotWork + 1; %workspace counter
-    end
+       didNotWork = didNotWork + 1; %workspace counter
+   end
 end
 
 sz = 30;

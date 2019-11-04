@@ -1,6 +1,6 @@
 function [thetaVector] = customIk(x,y)
 load('coeff.mat');
-
+thetaVector = [];
 setConstraints;
 
 xIndex = ceil(x/deltaCM) + 20;
@@ -9,15 +9,18 @@ yIndex = ceil(y/deltaCM) + 20;
 msg = 'Unreachable or Difficult to Reach';
 [numDataRow, numDataCol] = size(coeff);
 if (xIndex < 1 || xIndex > numDataRow)
-    error(msg);
+    %error(msg);
+    return;
 end
 
 if (yIndex < 1 || yIndex > numDataCol)
-    error(msg);
+    %error(msg);
+    return;
 end
 
 if isempty(coeff{xIndex,yIndex})
-    error(msg);
+    %error(msg);
+    return;
 end
 
 t11 = coeff{xIndex,yIndex}(1,1)*x + coeff{xIndex,yIndex}(1,2)*y + coeff{xIndex,yIndex}(1,3);

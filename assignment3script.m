@@ -124,7 +124,7 @@ end
 close(myWait);
 
 disp('completed coefficient generation')
-
+save('coeff.mat','coeff');
 
 %% Plotting
 fig1 = figure;
