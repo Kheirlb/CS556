@@ -56,14 +56,81 @@ for idx = 1:n
     xyCell{xIndex,yIndex} = [xyCell{xIndex,yIndex};[x,y,theta1rand,theta2rand]];
 end
 
-%% k-mean work, single cell
-% probably wise to create a new cell array
-% each cell would then contains to more cells that separate the data
-
+% creating temporay arrays of split data
 xyCell1 = cell(rowsXY,colsXY);
 xyCell2 = cell(rowsXY,colsXY);
-coeff = cell(rowsXY,colsXY);
 
+coeff = cell(rowsXY,colsXY); %creating primary online array
+
+%% k-mean
+
+for rowIdx = 1:rowsXY
+    for colIdx = 1:colsXY
+        [numRowsPerCell, ~] = size(xyCell{rowIdx,colIdx});
+        if numRowsPerCell > 2 && numRowsPerCell < 6
+            xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(:,:)];
+        end
+        if numRowsPerCell >= 6
+            idx = kmeans(xyCell{rowIdx,colIdx}(:,1:2),2);
+            for i = 1:length(idx)
+                if idx(i) == 1
+                    xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
+                else
+                    xyCell2{rowIdx,colIdx} = [xyCell2{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
+                end
+            end
+        end
+    end
+end
+
+%% linear regression and coefficients
+
+for rowIdx = 1:rowsXY
+    for colIdx = 1:colsXY
+        [numRowsPerCell1, ~] = size(xyCell1{rowIdx,colIdx});
+        if numRowsPerCell1 > 2
+            modelt1 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,3));
+            a = modelt1.Coefficients.Estimate(2);
+            b = modelt1.Coefficients.Estimate(3);
+            c = modelt1.Coefficients.Estimate(1);
+            modelt2 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,4));
+            d = modelt2.Coefficients.Estimate(2);
+            e = modelt2.Coefficients.Estimate(3);
+            f = modelt2.Coefficients.Estimate(1);
+            coeff{rowIdx,colIdx} = [a, b, c;
+                                    d, e, f];
+        end
+        [numRowsPerCell2, ~] = size(xyCell2{rowIdx,colIdx});
+        if numRowsPerCell2 > 2
+            modelt3 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,3));
+            a2 = modelt3.Coefficients.Estimate(2);
+            b2 = modelt3.Coefficients.Estimate(3);
+            c2 = modelt3.Coefficients.Estimate(1);
+            modelt4 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,4));
+            d2 = modelt4.Coefficients.Estimate(2);
+            e2 = modelt4.Coefficients.Estimate(3);
+            f2 = modelt4.Coefficients.Estimate(1);
+
+            secondCoeff = [a2, b2, c2;
+                           d2, e2, f2];
+            coeff{rowIdx,colIdx} = [coeff{rowIdx,colIdx}; secondCoeff];
+        end
+    end
+end
+
+%% Plotting
+fig1 = figure;
+scatter(theta1Array, theta2Array);
+grid on
+
+fig2 = figure;
+scatter(xArray, yArray);
+grid on
+
+%% Saving early work for reference
+% k-mean work, single cell
+% probably wise to create a new cell array
+% each cell would then contains to more cells that separate the data
 
 %if r>2 but r<6
 %xyCell1{4,21} = [xyCell1{4,21}; xyCell{4,21}(i,1:4)];
@@ -78,7 +145,7 @@ coeff = cell(rowsXY,colsXY);
 %     end
 % end
 
-%% Linear Regression and Store Coefficients
+% Linear Regression and Store Coefficients
 % linear regression on each nested cell for both cluster tables
 % store 3 for this cluster coefficients
 %r>2
@@ -106,71 +173,8 @@ coeff = cell(rowsXY,colsXY);
 %                 a2, b2, c2;
 %                 d2, e2, f2];
 
-%% k-mean
+% EARLY EARLY WORK
 
-for rowIdx = 1:rowsXY
-    for colIdx = 1:colsXY
-        [numRowsPerCell, ~] = size(xyCell{rowIdx,colIdx});
-        if numRowsPerCell > 2 && numRowsPerCell < 6
-            xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(:,:)];
-        end
-        if numRowsPerCell >= 6
-            idx = kmeans(xyCell{rowIdx,colIdx}(:,1:2),2);
-            for i = 1:length(idx)
-                if idx(i) == 1
-                    xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
-                else
-                    xyCell2{rowIdx,colIdx} = [xyCell2{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
-                end
-            end
-        end
-    end
-end
-
-%% linear regression and coefficients
-
-for rowIdx = 1:rowsXY
-    for colIdx = 1:colsXY
-        [numRowsPerCell, ~] = size(xyCell{rowIdx,colIdx});
-        if numRowsPerCell > 2
-            modelt1 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,3));
-            a = modelt1.Coefficients.Estimate(2);
-            b = modelt1.Coefficients.Estimate(3);
-            c = modelt1.Coefficients.Estimate(1);
-            modelt2 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,4));
-            d = modelt2.Coefficients.Estimate(2);
-            e = modelt2.Coefficients.Estimate(3);
-            f = modelt2.Coefficients.Estimate(1);
-            %r>2
-            modelt3 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,3));
-            a2 = modelt3.Coefficients.Estimate(2);
-            b2 = modelt3.Coefficients.Estimate(3);
-            c2 = modelt3.Coefficients.Estimate(1);
-            modelt4 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,4));
-            d2 = modelt4.Coefficients.Estimate(2);
-            e2 = modelt4.Coefficients.Estimate(3);
-            f2 = modelt4.Coefficients.Estimate(1);
-
-            coeff{rowIdx,colIdx} = [ a, b, c;
-                            d, e, f;
-                            a2, b2, c2;
-                            d2, e2, f2];
-            %cell complete
-        end
-    end
-end
-
-
-%% Plotting
-fig1 = figure;
-scatter(theta1Array, theta2Array);
-grid on
-
-fig2 = figure;
-scatter(xArray, yArray);
-grid on
-
-%% Early Work
 % scatter(theta1rand,theta2rand);
 % grid on;
 
