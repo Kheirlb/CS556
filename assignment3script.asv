@@ -69,42 +69,42 @@ coeff = cell(rowsXY,colsXY);
 %xyCell1{4,21} = [xyCell1{4,21}; xyCell{4,21}(i,1:4)];
 
 
-% idx = kmeans(xyCell{4,21}(:,1:2),2);
-% for i = 1:length(idx)
-%     if idx(i) == 1
-%         xyCell1{4,21} = [xyCell1{4,21}; xyCell{4,21}(i,1:4)];
-%     else
-%         xyCell2{4,21} = [xyCell2{4,21}; xyCell{4,21}(i,1:4)];
-%     end
-% end
+idx = kmeans(xyCell{4,21}(:,1:2),2);
+for i = 1:length(idx)
+    if idx(i) == 1
+        xyCell1{4,21} = [xyCell1{4,21}; xyCell{4,21}(i,1:4)];
+    else
+        xyCell2{4,21} = [xyCell2{4,21}; xyCell{4,21}(i,1:4)];
+    end
+end
 
 %% Linear Regression and Store Coefficients
 % linear regression on each nested cell for both cluster tables
 % store 3 for this cluster coefficients
 %r>2
 
-% modelt1 = fitlm(xyCell1{4,21}(:,1:2),xyCell1{4,21}(:,3));
-% a = modelt1.Coefficients.Estimate(2);
-% b = modelt1.Coefficients.Estimate(3);
-% c = modelt1.Coefficients.Estimate(1);
-% modelt2 = fitlm(xyCell1{4,21}(:,1:2),xyCell1{4,21}(:,4));
-% d = modelt2.Coefficients.Estimate(2);
-% e = modelt2.Coefficients.Estimate(3);
-% f = modelt2.Coefficients.Estimate(1);
-% %r>2
-% modelt1 = fitlm(xyCell2{4,21}(:,1:2),xyCell2{4,21}(:,3));
-% a2 = modelt1.Coefficients.Estimate(2);
-% b2 = modelt1.Coefficients.Estimate(3);
-% c2 = modelt1.Coefficients.Estimate(1);
-% modelt2 = fitlm(xyCell2{4,21}(:,1:2),xyCell2{4,21}(:,4));
-% d2 = modelt2.Coefficients.Estimate(2);
-% e2 = modelt2.Coefficients.Estimate(3);
-% f2 = modelt2.Coefficients.Estimate(1);
-% 
-% coeff{4,21} = [ a, b, c;
-%                 d, e, f;
-%                 a2, b2, c2;
-%                 d2, e2, f2];
+modelt1 = fitlm(xyCell1{4,21}(:,1:2),xyCell1{4,21}(:,3));
+a = modelt1.Coefficients.Estimate(2);
+b = modelt1.Coefficients.Estimate(3);
+c = modelt1.Coefficients.Estimate(1);
+modelt2 = fitlm(xyCell1{4,21}(:,1:2),xyCell1{4,21}(:,4));
+d = modelt2.Coefficients.Estimate(2);
+e = modelt2.Coefficients.Estimate(3);
+f = modelt2.Coefficients.Estimate(1);
+%r>2
+modelt1 = fitlm(xyCell2{4,21}(:,1:2),xyCell2{4,21}(:,3));
+a2 = modelt1.Coefficients.Estimate(2);
+b2 = modelt1.Coefficients.Estimate(3);
+c2 = modelt1.Coefficients.Estimate(1);
+modelt2 = fitlm(xyCell2{4,21}(:,1:2),xyCell2{4,21}(:,4));
+d2 = modelt2.Coefficients.Estimate(2);
+e2 = modelt2.Coefficients.Estimate(3);
+f2 = modelt2.Coefficients.Estimate(1);
+
+coeff{4,21} = [ a, b, c;
+                d, e, f;
+                a2, b2, c2;
+                d2, e2, f2];
 
 %% k-mean
 
@@ -131,32 +131,28 @@ end
 
 for rowIdx = 1:rowsXY
     for colIdx = 1:colsXY
-        [numRowsPerCell, ~] = size(xyCell{rowIdx,colIdx});
-        if numRowsPerCell > 2
-            modelt1 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,3));
-            a = modelt1.Coefficients.Estimate(2);
-            b = modelt1.Coefficients.Estimate(3);
-            c = modelt1.Coefficients.Estimate(1);
-            modelt2 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,4));
-            d = modelt2.Coefficients.Estimate(2);
-            e = modelt2.Coefficients.Estimate(3);
-            f = modelt2.Coefficients.Estimate(1);
-            %r>2
-            modelt3 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,3));
-            a2 = modelt3.Coefficients.Estimate(2);
-            b2 = modelt3.Coefficients.Estimate(3);
-            c2 = modelt3.Coefficients.Estimate(1);
-            modelt4 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,4));
-            d2 = modelt4.Coefficients.Estimate(2);
-            e2 = modelt4.Coefficients.Estimate(3);
-            f2 = modelt4.Coefficients.Estimate(1);
+        modelt1 = fitlm(xyCell1{4,21}(:,1:2),xyCell1{4,21}(:,3));
+        a = modelt1.Coefficients.Estimate(2);
+        b = modelt1.Coefficients.Estimate(3);
+        c = modelt1.Coefficients.Estimate(1);
+        modelt2 = fitlm(xyCell1{4,21}(:,1:2),xyCell1{4,21}(:,4));
+        d = modelt2.Coefficients.Estimate(2);
+        e = modelt2.Coefficients.Estimate(3);
+        f = modelt2.Coefficients.Estimate(1);
+        %r>2
+        modelt1 = fitlm(xyCell2{4,21}(:,1:2),xyCell2{4,21}(:,3));
+        a2 = modelt1.Coefficients.Estimate(2);
+        b2 = modelt1.Coefficients.Estimate(3);
+        c2 = modelt1.Coefficients.Estimate(1);
+        modelt2 = fitlm(xyCell2{4,21}(:,1:2),xyCell2{4,21}(:,4));
+        d2 = modelt2.Coefficients.Estimate(2);
+        e2 = modelt2.Coefficients.Estimate(3);
+        f2 = modelt2.Coefficients.Estimate(1);
 
-            coeff{rowIdx,colIdx} = [ a, b, c;
-                            d, e, f;
-                            a2, b2, c2;
-                            d2, e2, f2];
-            %cell complete
-        end
+        coeff{4,21} = [ a, b, c;
+                        d, e, f;
+                        a2, b2, c2;
+                        d2, e2, f2];
     end
 end
 
