@@ -13,18 +13,14 @@ robfk = rob.fkine([theta1 theta2])
 xEq = robfk.t(1,1);
 yEq = robfk.t(2,1);
 
-robik = rob.ikine([-160 9])
+disp('created forward kinematics robot')
 
 %% Constraints & Initialization
 n = 25000;
 
-theta1low = 0;
-theta1high = 170;
-theta2low = -90;
-theta2high = 90;
+%global theta1low theta1high theta2low theta2high deltaTheta deltaCM l1 l2
+setConstraints;
 
-deltaTheta = 10;
-deltaCM = 10;
 numCellsRow = ceil(170/deltaTheta);
 numCellsCol = ceil(180/deltaTheta);
 thetaCountCell = zeros(numCellsRow,numCellsCol);
@@ -64,6 +60,7 @@ xyCell2 = cell(rowsXY,colsXY);
 
 coeff = cell(rowsXY,colsXY); %creating primary online array
 
+disp('generated x and y')
 %% k-mean
 
 for rowIdx = 1:rowsXY
@@ -85,7 +82,10 @@ for rowIdx = 1:rowsXY
     end
 end
 
+disp('completed k-mean')
 %% linear regression and coefficients
+
+myWait = waitbar(0,'Generating Coeff');
 
 for rowIdx = 1:rowsXY
     for colIdx = 1:colsXY
@@ -118,7 +118,13 @@ for rowIdx = 1:rowsXY
             coeff{rowIdx,colIdx} = [coeff{rowIdx,colIdx}; secondCoeff];
         end
     end
+    waitbar((rowIdx/rowsXY),myWait,'Generating Coeff');
 end
+
+close(myWait);
+
+disp('completed coefficient generation')
+
 
 %% Plotting
 fig1 = figure;
@@ -127,6 +133,8 @@ grid on
 
 fig2 = figure;
 scatter(xArray, yArray);
+xlim([-200, 200]);
+ylim([-200, 200]);
 grid on
 
 

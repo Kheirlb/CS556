@@ -1,4 +1,4 @@
-function [thetaVector] = customIkClosed(x,y,l1,l2)
+function [thetaVector] = closedIk(x,y,l1,l2)
 t2rad1 = atan2(sqrt(1-((x^2 + y^2 - l1^2 - l2^2)/(2*l1*l2))),((x^2 + y^2 - l1^2 - l2^2)/(2*l1*l2)));
 t2rad2 = atan2(-sqrt(1-((x^2 + y^2 - l1^2 - l2^2)/(2*l1*l2))),((x^2 + y^2 - l1^2 - l2^2)/(2*l1*l2)));
 
