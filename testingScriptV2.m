@@ -10,7 +10,7 @@ xhigh = 200;
 ylow = -200;
 yhigh = 200;
 
-testSize = 600;
+testSize = 100;
 xTestVec = (xhigh-xlow).*rand(testSize,1) + xlow;
 yTestVec = (yhigh-ylow).*rand(testSize,1) + ylow;
 xyVec = [xTestVec, yTestVec];
@@ -41,6 +41,8 @@ xVar = [];
 yVar = [];
 xVar2 = [];
 yVar2 = [];
+mark2ans1 = [];
+mark2ans2 = [];
 
 for testi = 1:testSize
     x = xTestVec(testi);
@@ -58,12 +60,14 @@ for testi = 1:testSize
         if length(thetasIk) > 0
             xUsed = [xUsed, x];
             yUsed = [yUsed, y];
+            mark2ans1 = [mark2ans1, length(xUsed)];
             xVar = [xVar, 100*cosd(thetasIk(1) + thetasIk(2)) + 100*cosd(thetasIk(1))];
             yVar = [yVar, 100*sind(thetasIk(1) + thetasIk(2)) + 100*sind(thetasIk(1))];
         end
         if length(thetasIk) > 2
             xUsed = [xUsed, x];
             yUsed = [yUsed, y];
+            mark2ans2 = [mark2ans2, length(xUsed)];
             xVar = [xVar, 100*cosd(thetasIk(3) + thetasIk(4)) + 100*cosd(thetasIk(3))];
             yVar = [yVar, 100*sind(thetasIk(3) + thetasIk(4)) + 100*sind(thetasIk(3))];
         end        
@@ -85,18 +89,26 @@ end
 sz = 30;
 scatter(xTestVec,yTestVec,3,'filled','MarkerFaceColor',[0 0 0]); %randomXY
 hold on
-scatter(xSpace,ySpace,1,'filled','MarkerFaceColor',[0 0 0.5]); %workspace
 axis equal
 grid on
-scatter(xUsed,yUsed,sz,'MarkerEdgeColor',[0 0 1],'LineWidth',1.5); %selected
-scatter(xVar,yVar,sz,'filled','MarkerFaceColor',[1 0 0]); %customIk
+plot(xSpace,ySpace,'c');
+%scatter(xSpace,ySpace,1,'filled','MarkerFaceColor',[0 0 0.5]); %workspace
+scatter(xUsed,yUsed,sz*2,'MarkerEdgeColor',[0 0 1],'LineWidth',1.5); %selected
+scatter(xVar,yVar,sz/2,'filled','MarkerFaceColor',[1 0 0]); %customIk
 %scatter(xVar2,yVar2,sz/3,'filled','MarkerFaceColor',[0 1 0]); %closedIk
+
+% %show points with two answers
+% scatter(xVar(mark2ans1),yVar(mark2ans1),80,'m','LineWidth',1.25);
+% 
+% %show points with two answers
+% scatter(xVar(mark2ans2),yVar(mark2ans2),170,'k','LineWidth',1.25);
+
+%plot variance using lines
 for iter = 1:length(xUsed)
     plot([xUsed(iter), xVar(iter)],[yUsed(iter), yVar(iter)], 'k')
 end
 
-
-legend('randomXY','workspace','selected','customIk','variance')
+legend('randomXY','workspace','selected','customIk','variance');
 ylabel('Distance [cm]');
 xlabel('Distance [cm]');
 title('2 DoF Spatial Decompostion Plot (FofM)');

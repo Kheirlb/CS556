@@ -4,7 +4,8 @@ L1 = l1;
 L2 = l2;
 xSpace = [];
 ySpace = [];
-skip = 1;
+skip = 5;
+
 for n = theta1low:skip:theta1high
     dh1 = dh_standard(n,0,L1,0);
     for m = theta2low:skip:theta2high
@@ -14,3 +15,5 @@ for n = theta1low:skip:theta1high
         ySpace = [ySpace, result(2,4)];
     end
 end
+
+plot(xSpace,ySpace);
