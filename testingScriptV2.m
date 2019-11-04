@@ -33,6 +33,8 @@ for testi = 1:testSize
         thetas{testi} = customIk(xTestVec(testi),yTestVec(testi));
         scatter(xTestVec(testi),yTestVec(testi),'filled','d');
         
+        %compare variance here!!!
+        
     catch
         %catch if not in workspace
         didNotWork = didNotWork + 1; %workspace counter
