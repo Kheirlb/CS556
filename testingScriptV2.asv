@@ -20,7 +20,7 @@ L1 = l1;
 L2 = l2;
 xSpace = [];
 ySpace = [];
-skip = 2;
+skip = 1;
 for n = theta1low:skip:theta1high
     dh1 = dh_standard(n,0,L1,0);
     for m = theta2low:skip:theta2high
@@ -53,17 +53,15 @@ for testi = 1:testSize
         thetas{testi,2} = thetasIk;
         thetas{testi,3} = thetasIkClosed;
         
+        xUsed = [xUsed, x];
+        yUsed = [yUsed, y];
         %compare variance here!!!
         
         if length(thetasIk) > 0
-            xUsed = [xUsed, x];
-            yUsed = [yUsed, y];
             xVar = [xVar, 100*cosd(thetasIk(1) + thetasIk(2)) + 100*cosd(thetasIk(1))];
             yVar = [yVar, 100*sind(thetasIk(1) + thetasIk(2)) + 100*sind(thetasIk(1))];
         end
         if length(thetasIk) > 2
-            xUsed = [xUsed, x];
-            yUsed = [yUsed, y];
             xVar = [xVar, 100*cosd(thetasIk(3) + thetasIk(4)) + 100*cosd(thetasIk(3))];
             yVar = [yVar, 100*sind(thetasIk(3) + thetasIk(4)) + 100*sind(thetasIk(3))];
         end        
@@ -83,20 +81,22 @@ for testi = 1:testSize
 end
 
 sz = 30;
-scatter(xTestVec,yTestVec,3,'filled','MarkerFaceColor',[0 0 0]); %randomXY
+scatter(xTestVec,yTestVec,3,'filled','MarkerFaceColor',[0 0 0.25]); %randomXY
 hold on
-scatter(xSpace,ySpace,1,'filled','MarkerFaceColor',[0 0 0.5]); %workspace
+scatter(xSpace,ySpace,1,'filled','MarkerFaceColor',[0 0.5 0.5]); %workspace
 axis equal
 grid on
-scatter(xUsed,yUsed,sz,'MarkerEdgeColor',[0 0 1],'LineWidth',1.5); %selected
-scatter(xVar,yVar,sz,'filled','MarkerFaceColor',[1 0 0]); %customIk
-%scatter(xVar2,yVar2,sz/3,'filled','MarkerFaceColor',[0 1 0]); %closedIk
-for iter = 1:length(xUsed)
-    plot([xUsed(iter), xVar(iter)],[yUsed(iter), yVar(iter)], 'k')
+scatter(xUsed,yUsed,sz,'MarkerEdgeColor',[0 0 1],'LineWidth',1.5);
+scatter(xVar,yVar,sz,'filled','MarkerFaceColor',[1 0 0]);
+scatter(xVar2,yVar2,sz/2,'filled','MarkerFaceColor',[0 1 0]);
+for xLi = 1:length(xUsed)
+    for yLi = 1:length(yUsed)
+        plot([xUsed(xLi), 100],[yUsed(yLi), 100], 'k')
+    end
 end
 
 
-legend('randomXY','workspace','selected','customIk','variance')
+legend('randomXY','workspace','selected','customIk','closedIk')
 ylabel('Distance [cm]');
 xlabel('Distance [cm]');
-title('2 DoF Spatial Decompostion Plot (FofM)');
+title('Workspace');

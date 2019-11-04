@@ -1,4 +1,5 @@
 function [thetaVector] = closedIk_v2(x,y,l1,l2)
+thetaVector = [];
 
 t2rad1 = acos((x^2 + y^2 - l1^2 - l2^2)/(2*l1*l2));
 t1rad1 = atan2(y,x) - atan2(l2*sin(t2rad1), l1 + l2*cos(t2rad1));
