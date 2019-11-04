@@ -11,8 +11,8 @@ rob = SerialLink(DH)
 robfk = rob.fkine([theta1 theta2])
 xEq = robfk.t(1,1);
 yEq = robfk.t(2,1);
-
-robik = rob.ikine([x y])
+preach = [160.0,9.0]
+robik = rob.ikcon(robfk,preach)
 
 %% generate points and compare
 xlow = -200;
