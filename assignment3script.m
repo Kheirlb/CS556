@@ -13,6 +13,8 @@ robfk = rob.fkine([theta1 theta2])
 xEq = robfk.t(1,1);
 yEq = robfk.t(2,1);
 
+robik = rob.ikine([-160 9])
+
 %% Constraints & Initialization
 n = 25000;
 
@@ -126,6 +128,7 @@ grid on
 fig2 = figure;
 scatter(xArray, yArray);
 grid on
+
 
 %% Saving early work for reference
 % k-mean work, single cell

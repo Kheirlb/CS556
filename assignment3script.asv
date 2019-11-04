@@ -56,7 +56,7 @@ for idx = 1:n
     xyCell{xIndex,yIndex} = [xyCell{xIndex,yIndex};[x,y,theta1rand,theta2rand]];
 end
 
-% creating te
+% creating temporay arrays of split data
 xyCell1 = cell(rowsXY,colsXY);
 xyCell2 = cell(rowsXY,colsXY);
 
@@ -126,6 +126,14 @@ grid on
 fig2 = figure;
 scatter(xArray, yArray);
 grid on
+
+%% Use customIk
+
+xlow = -200;
+xhigh = 200;
+ylow = -200;
+yhigh = 200;
+
 
 %% Saving early work for reference
 % k-mean work, single cell

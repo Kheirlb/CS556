@@ -1,0 +1,23 @@
+clear; clc; close all;
+
+xlow = -200;
+xhigh = 200;
+ylow = -200;
+yhigh = 200;
+
+testSize = 100;
+xTestVec = (xhigh-xlow).*rand(testSize,1) + xlow;
+yTestVec = (yhigh-ylow).*rand(testSize,1) + ylow;
+scatter(xTestVec,yTestVec);
+hold on
+didNotWork = 0;
+thetas = cell(1,100);
+
+for testi = 1:testSize
+    try
+        thetas = customIk(xTestVec(testi),yTestVec(testi));
+        scatter(xTestVec(testi),yTestVec(testi),'filled','d');
+    catch
+        didNotWork = didNotWork + 1;
+    end
+end
