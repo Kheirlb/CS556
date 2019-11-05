@@ -36,7 +36,7 @@ end
 
 
 didNotWork = 0;
-thetas = cell(100,3);
+thetas = cell(testSize,3);
 
 xUsed = [];
 yUsed = [];
@@ -84,6 +84,7 @@ for testi = 1:testSize
         end
         
         thetasIkClosed = closedIk_v2(x,y,l1,l2);
+        storeClosedThetas1 = [storeClosedThetas1; thetasIkClosed(1:2)];
         if length(thetasIk) > 2 
             storeClosedThetas2 = [storeClosedThetas2; thetasIkClosed(3:4)];
         end
@@ -102,6 +103,7 @@ for testi = 1:testSize
   end
 end
 
+%% workspace figure
 fig1 = figure(1);
 sz = 30;
 scatter(xTestVec,yTestVec,3,'filled','MarkerFaceColor',[0 0 0]); %randomXY
@@ -125,20 +127,21 @@ for iter = 1:length(xUsed)
     plot([xUsed(iter), xVar(iter)],[yUsed(iter), yVar(iter)], 'k')
 end
 
-legend('randomXY','workspace','selected','customIk','variance');
+legend('randomXY','workspace','in range','customIk','variance');
 xlabel('X Distance [cm]');
 ylabel('Y Distance [cm]');
-title('2 DoF Spatial Decompostion Plot (FofM)');
+title('2 DoF Spatial Decompostion Work-Space (FofM)');
 
+%% joint space
 fig2 = figure(2);
-scatter(storeThetas(:,1),storeThetas(:,2),'b');
+scatter(storeThetas1(:,1),storeThetas1(:,2),'b');
 hold on;
 axis equal;
 grid on;
-scatter(storeThetas(:,3),storeThetas(:,4),'b');
-scatter(storeClosedThetas(:,1),storeClosedThetas(:,2),'filled','k');
-scatter(storeClosedThetas(:,3),storeClosedThetas(:,4),'filled','k');
+scatter(storeThetas2(:,1),storeThetas2(:,2),'b');
+scatter(storeClosedThetas1(:,1),storeClosedThetas1(:,2),10,'filled','MarkerFaceColor',[1 0 0]);
+scatter(storeClosedThetas2(:,1),storeClosedThetas2(:,2),10,'filled','MarkerFaceColor',[0.5 0 0]);
 legend('custom 1','custom 2','closed 1','closed 2');
 xlabel('t1 angle [deg]');
 ylabel('t2 angle [deg]');
-title('2 DoF Spatial Decompostion Joint-Space Plot (FofM)');
+title('2 DoF Spatial Decompostion Joint-Space (FofM)');

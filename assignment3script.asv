@@ -2,7 +2,7 @@ clear; clc; close all;
 %Authors: Ashley Lacy and Karl Parks
 
 %% Constraints & Initialization
-n = 5000;
+n = 25000;
 
 %global theta1low theta1high theta2low theta2high deltaTheta deltaCM l1 l2
 setConstraints;
@@ -29,18 +29,20 @@ theta2Array = [];
 for idx = 1:n
     theta1rand = (theta1high-theta1low).*rand(1,1);
     theta2rand = theta2low + (theta2high-theta2low).*rand(1,1);
-    theta1Index = ceil(theta1rand/deltaTheta);
-    theta2Index = ceil(theta2rand/deltaTheta);%this could end up being a negative number.... then it would not pull correctly from
+    
     theta2shift = (theta2high-theta2low)/(2*deltaTheta);
-    thetaCountCell(theta1Index,theta2Index + theta2shift) = thetaCountCell(theta1Index,theta2Index + theta2shift) + 1; %here...
+    theta1Index = ceil(theta1rand/deltaTheta);
+    theta2Index = ceil(theta2rand/deltaTheta + theta2shift);
+    %the above could end up being a negative number.... then it would not pull correctly from
+   
+    thetaCountCell(theta1Index,theta2Index) = thetaCountCell(theta1Index,theta2Index) + 1; %here...
     theta1Array = [theta1Array,theta1rand];
     theta2Array = [theta2Array,theta2rand];
     x = 100*cosd(theta1rand + theta2rand) + 100*cosd(theta1rand);
     y = 100*sind(theta1rand + theta2rand) + 100*sind(theta1rand);
     xArray = [xArray, x];
     yArray = [yArray, y];
-    xIndex = ceil(x/deltaCM) + (l1+l2)/deltaCM;
-    yIndex = ceil(y/deltaCM) + (l1+l2)/deltaCM;
+    [xIndex,yIndex] = findxyIndex(x,y);
     %2xN Double Array in Each Cell. X is top row, Y is bottom row
     xyCell{xIndex,yIndex} = [xyCell{xIndex,yIndex};[x,y,theta1rand,theta2rand]];
     thetaCell{theta1Index,theta2Index} = [thetaCell{theta1Index,theta2Index};[theta1rand,theta2rand,x,y]];
@@ -49,11 +51,35 @@ end
 % creating temporay arrays of split data
 xyCell1 = cell(rowsXY,colsXY);
 xyCell2 = cell(rowsXY,colsXY);
+thetaCell1 = cell(numCellsRow,numCellsCol);
+thetaCell2 = cell(numCellsRow,numCellsCol);
 
 coeff = cell(rowsXY,colsXY); %creating primary online array
+thetaCoeff = cell(rowsXY,colsXY);
 
-disp('generated x and y')
+disp('generated x and y, and the fofm thetas')
 %% k-mean
+
+for rowIdx = 1:numCellsRow
+    for colIdx = 1:numCellsCol
+        [numRowsPerCell, ~] = size(thetaCell{rowIdx,colIdx});
+        if numRowsPerCell > 2 && numRowsPerCell < 6
+            thetaCell1{rowIdx,colIdx} = [thetaCell1{rowIdx,colIdx}; thetaCell{rowIdx,colIdx}(:,:)];
+        end
+        if numRowsPerCell >= 6
+            idx = kmeans(thetaCell{rowIdx,colIdx}(:,1:2),2,'Replicates',25);
+            for i = 1:length(idx)
+                if idx(i) == 1
+                    thetaCell1{rowIdx,colIdx} = [thetaCell1{rowIdx,colIdx}; thetaCell{rowIdx,colIdx}(i,1:4)];
+                else
+                    thetaCell2{rowIdx,colIdx} = [thetaCell2{rowIdx,colIdx}; thetaCell{rowIdx,colIdx}(i,1:4)];
+                end
+            end
+        end
+    end
+end
+
+disp('completed k-mean for thetas')
 
 for rowIdx = 1:rowsXY
     for colIdx = 1:colsXY
@@ -74,10 +100,67 @@ for rowIdx = 1:rowsXY
     end
 end
 
-disp('completed k-mean')
+disp('completed k-mean for x and y')
 %% linear regression and coefficients
 
-myWait = waitbar(0,'Generating Coeff');
+msgT = 'Generating Coeff for Thetas';
+myWait = waitbar(0,msgT);
+
+for rowIdx = 1:numCellsRow
+    for colIdx = 1:numCellsCol
+        [numRowsPerCell1, ~] = size(thetaCell1{rowIdx,colIdx});
+        if numRowsPerCell1 > 2
+            modelt1 = fitlm(thetaCell1{rowIdx,colIdx}(:,3:4),thetaCell1{rowIdx,colIdx}(:,1));
+            a = modelt1.Coefficients.Estimate(2);
+            b = modelt1.Coefficients.Estimate(3);
+            c = modelt1.Coefficients.Estimate(1);
+            modelt2 = fitlm(thetaCell1{rowIdx,colIdx}(:,3:4),thetaCell1{rowIdx,colIdx}(:,2));
+            d = modelt2.Coefficients.Estimate(2);
+            e = modelt2.Coefficients.Estimate(3);
+            f = modelt2.Coefficients.Estimate(1);
+            for rowIter = 1:length(thetaCell1{rowIdx,colIdx}(:,3))
+                [xIndex,yIndex] = findxyIndex(thetaCell1{rowIdx,colIdx}(rowIter,3),thetaCell1{rowIdx,colIdx}(rowIter,4));
+                if isempty(thetaCoeff{xIndex,yIndex})
+                    t2 = d*thetaCell1{rowIdx,colIdx}(rowIter,3) + e*thetaCell1{rowIdx,colIdx}(rowIter,4) + f;
+                    thetaCoeff{xIndex,yIndex} = [a, b, c, 0;
+                                                 d, e, f, t2];
+                end
+            end
+        end
+        [numRowsPerCell2, ~] = size(thetaCell2{rowIdx,colIdx});
+        if numRowsPerCell2 > 2
+            modelt3 = fitlm(thetaCell2{rowIdx,colIdx}(:,3:4),thetaCell2{rowIdx,colIdx}(:,1));
+            a2 = modelt3.Coefficients.Estimate(2);
+            b2 = modelt3.Coefficients.Estimate(3);
+            c2 = modelt3.Coefficients.Estimate(1);
+            modelt4 = fitlm(thetaCell2{rowIdx,colIdx}(:,3:4),thetaCell2{rowIdx,colIdx}(:,2));
+            d2 = modelt4.Coefficients.Estimate(2);
+            e2 = modelt4.Coefficients.Estimate(3);
+            f2 = modelt4.Coefficients.Estimate(1);
+            for rowIter = 1:length(thetaCell2{rowIdx,colIdx}(:,3))
+                [xIndex,yIndex] = findxyIndex(thetaCell2{rowIdx,colIdx}(rowIter,3),thetaCell2{rowIdx,colIdx}(rowIter,4));
+                [rowCount, ~] = size(thetaCoeff{xIndex,yIndex});
+                if rowCount == 0 
+                    secondCoeff = [a2, b2, c2;
+                                   d2, e2, f2];
+                    thetaCoeff{xIndex,yIndex} = [thetaCoeff{xIndex,yIndex}; secondCoeff];
+                end
+                if rowCount == 2 
+                    secondCoeff = [a2, b2, c2;
+                                   d2, e2, f2];
+                    thetaCoeff{xIndex,yIndex} = [thetaCoeff{xIndex,yIndex}; secondCoeff];
+                end    
+            end
+        end
+    end
+    waitbar((rowIdx/rowsXY),myWait,msgT);
+end
+
+close(myWait);
+disp('completed coefficient generation for thetas')
+
+msgXY = 'Generating Coeff for x and y';
+myWait = waitbar(0,msgXY);
 
 for rowIdx = 1:rowsXY
     for colIdx = 1:colsXY
@@ -110,13 +193,16 @@ for rowIdx = 1:rowsXY
             coeff{rowIdx,colIdx} = [coeff{rowIdx,colIdx}; secondCoeff];
         end
     end
-    waitbar((rowIdx/rowsXY),myWait,'Generating Coeff');
+    waitbar((rowIdx/rowsXY),myWait,msgXY);
 end
 
 close(myWait);
 
-disp('completed coefficient generation')
+disp('completed coefficient generation for x and y')
+
+%% saving data
 save('coeff.mat','coeff');
+save('thetaCoeff.mat','thetaCoeff');
 
 %% Plotting
 fig1 = figure;
@@ -129,7 +215,8 @@ xlim([-200, 200]);
 ylim([-200, 200]);
 grid on
 
-close all;
+%%
+%close all;
 %testingScriptV2;
 
 %% Saving early work for reference

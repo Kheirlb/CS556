@@ -1,6 +1,5 @@
 function [thetaVector] = customIk(x,y)
-load('thetaCoeff.mat');
-coeff = thetaCoeff;
+load('coeff.mat');
 thetaVector = [];
 setConstraints;
 

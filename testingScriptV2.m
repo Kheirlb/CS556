@@ -36,7 +36,7 @@ end
 
 
 didNotWork = 0;
-thetas = cell(100,3);
+thetas = cell(testSize,3);
 
 xUsed = [];
 yUsed = [];
@@ -116,31 +116,31 @@ scatter(xUsed,yUsed,sz*2,'MarkerEdgeColor',[0 0 1],'LineWidth',1.5); %selected
 scatter(xVar,yVar,sz/2,'filled','MarkerFaceColor',[1 0 0]); %customIk
 %scatter(xVar2,yVar2,sz/3,'filled','MarkerFaceColor',[0 1 0]); %closedIk
 
-% %show points with two answers
-% scatter(xVar(mark2ans1),yVar(mark2ans1),80,'m','LineWidth',1.25);
-% 
-% %show points with two answers
-% scatter(xVar(mark2ans2),yVar(mark2ans2),170,'k','LineWidth',1.25);
+%show points with two answers
+scatter(xVar(mark2ans1),yVar(mark2ans1),80,'m','LineWidth',1.25);
+
+%show points with two answers
+scatter(xVar(mark2ans2),yVar(mark2ans2),170,'k','LineWidth',1.25);
 
 %plot variance using lines
 for iter = 1:length(xUsed)
     plot([xUsed(iter), xVar(iter)],[yUsed(iter), yVar(iter)], 'k')
 end
 
-legend('randomXY','workspace','in range','customIk','variance');
+legend('randomXY','workspace','in range','customIk','1st Sol','2nd Sol','variance');
 xlabel('X Distance [cm]');
 ylabel('Y Distance [cm]');
 title('2 DoF Spatial Decompostion Work-Space (FofM)');
 
 %% joint space
 fig2 = figure(2);
-scatter(storeThetas1(:,1),storeThetas1(:,2),'b');
+scatter(storeThetas1(:,1),storeThetas1(:,2),'MarkerEdgeColor',[0 1 0]);
 hold on;
 axis equal;
 grid on;
-scatter(storeThetas2(:,1),storeThetas2(:,2),'b');
-scatter(storeClosedThetas1(:,1),storeClosedThetas1(:,2),5,'filled','k');
-scatter(storeClosedThetas2(:,1),storeClosedThetas2(:,2),15,'filled','k');
+scatter(storeThetas2(:,1),storeThetas2(:,2),'MarkerEdgeColor',[0 0.5 0]);
+scatter(storeClosedThetas1(:,1),storeClosedThetas1(:,2),10,'filled','MarkerFaceColor',[1 0 0]);
+scatter(storeClosedThetas2(:,1),storeClosedThetas2(:,2),10,'filled','MarkerFaceColor',[0.5 0 0]);
 legend('custom 1','custom 2','closed 1','closed 2');
 xlabel('t1 angle [deg]');
 ylabel('t2 angle [deg]');
