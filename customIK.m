@@ -3,8 +3,8 @@ load('coeff.mat');
 thetaVector = [];
 setConstraints;
 
-xIndex = ceil(x/deltaCM) + 20;
-yIndex = ceil(y/deltaCM) + 20;
+xIndex = ceil(x/deltaCM) + (l1+l2)/deltaCM;
+yIndex = ceil(y/deltaCM) + (l1+l2)/deltaCM;
 
 msg = 'Unreachable or Difficult to Reach';
 [numDataRow, numDataCol] = size(coeff);

@@ -3,6 +3,7 @@ clear; clc; close all;
 %% Initial values
 setConstraints;
 load('storedXY.mat')
+load('xyVec.mat')
 
 %% randomly generate points and compare
 xlow = -200;
@@ -10,10 +11,12 @@ xhigh = 200;
 ylow = -200;
 yhigh = 200;
 
-testSize = 100;
-xTestVec = (xhigh-xlow).*rand(testSize,1) + xlow;
-yTestVec = (yhigh-ylow).*rand(testSize,1) + ylow;
-xyVec = [xTestVec, yTestVec];
+testSize = 500;
+%xTestVec = (xhigh-xlow).*rand(testSize,1) + xlow;
+%yTestVec = (yhigh-ylow).*rand(testSize,1) + ylow;
+%xyVec = [xTestVec, yTestVec];
+xTestVec = xyVec(:,1);
+yTestVec = xyVec(:,2);
 
 %show workspace
 L1 = l1;
@@ -44,16 +47,24 @@ yVar2 = [];
 mark2ans1 = [];
 mark2ans2 = [];
 
+storeThetas1 = zeros(1,2);
+storeThetas2 = zeros(1,2);
+storeClosedThetas1 = zeros(1,2);
+storeClosedThetas2 = zeros(1,2);
+
 for testi = 1:testSize
     x = xTestVec(testi);
     y = yTestVec(testi);
   try
         thetas{testi,1} = [x,y];
         thetasIk = customIk(x,y);
-        thetasIkClosed = closedIk_v2(x,y,l1,l2);
+        storeThetas1 = [storeThetas1; thetasIk(1:2)];
+        if length(thetasIk) > 2 
+            storeThetas2 = [storeThetas2; thetasIk(3:4)];
+        end
         %if checkRangeThetas(thetasIkClosed(1), thetasIkClosed(2))
         thetas{testi,2} = thetasIk;
-        thetas{testi,3} = thetasIkClosed;
+        
         
         %compare variance here!!!
         
@@ -70,29 +81,37 @@ for testi = 1:testSize
             mark2ans2 = [mark2ans2, length(xUsed)];
             xVar = [xVar, 100*cosd(thetasIk(3) + thetasIk(4)) + 100*cosd(thetasIk(3))];
             yVar = [yVar, 100*sind(thetasIk(3) + thetasIk(4)) + 100*sind(thetasIk(3))];
-        end        
+        end
         
-        if length(thetasIkClosed) > 0
-            xVar2 = [xVar2, 100*cosd(thetasIkClosed(1) + thetasIkClosed(2)) + 100*cosd(thetasIkClosed(1))];
-            yVar2 = [yVar2, 100*sind(thetasIkClosed(1) + thetasIkClosed(2)) + 100*sind(thetasIkClosed(1))];
+        thetasIkClosed = closedIk_v2(x,y,l1,l2);
+        storeClosedThetas1 = [storeClosedThetas1; thetasIkClosed(1:2)];
+        if length(thetasIk) > 2 
+            storeClosedThetas2 = [storeClosedThetas2; thetasIkClosed(3:4)];
         end
-        if length(thetasIkClosed) > 2
-            xVar2 = [xVar2, 100*cosd(thetasIkClosed(3) + thetasIkClosed(4)) + 100*cosd(thetasIkClosed(3))];
-            yVar2 = [yVar2, 100*sind(thetasIkClosed(3) + thetasIkClosed(4)) + 100*sind(thetasIkClosed(3))];
-        end
+%         thetas{testi,3} = thetasIkClosed;       
+%         if length(thetasIkClosed) > 0
+%             xVar2 = [xVar2, 100*cosd(thetasIkClosed(1) + thetasIkClosed(2)) + 100*cosd(thetasIkClosed(1))];
+%             yVar2 = [yVar2, 100*sind(thetasIkClosed(1) + thetasIkClosed(2)) + 100*sind(thetasIkClosed(1))];
+%         end
+%         if length(thetasIkClosed) > 2
+%             xVar2 = [xVar2, 100*cosd(thetasIkClosed(3) + thetasIkClosed(4)) + 100*cosd(thetasIkClosed(3))];
+%             yVar2 = [yVar2, 100*sind(thetasIkClosed(3) + thetasIkClosed(4)) + 100*sind(thetasIkClosed(3))];
+%         end
   catch
-        %catch if not in workspace
+      %catch if not in workspace
       didNotWork = didNotWork + 1; %workspace counter
   end
 end
 
+%% workspace figure
+fig1 = figure(1);
 sz = 30;
 scatter(xTestVec,yTestVec,3,'filled','MarkerFaceColor',[0 0 0]); %randomXY
 hold on
 axis equal
 grid on
-plot(xSpace,ySpace,'c');
-%scatter(xSpace,ySpace,1,'filled','MarkerFaceColor',[0 0 0.5]); %workspace
+%plot(xSpace,ySpace,'c');
+scatter(xSpace,ySpace,1,'filled','MarkerFaceColor',[0 0 0.5]); %workspace
 scatter(xUsed,yUsed,sz*2,'MarkerEdgeColor',[0 0 1],'LineWidth',1.5); %selected
 scatter(xVar,yVar,sz/2,'filled','MarkerFaceColor',[1 0 0]); %customIk
 %scatter(xVar2,yVar2,sz/3,'filled','MarkerFaceColor',[0 1 0]); %closedIk
@@ -108,7 +127,21 @@ for iter = 1:length(xUsed)
     plot([xUsed(iter), xVar(iter)],[yUsed(iter), yVar(iter)], 'k')
 end
 
-legend('randomXY','workspace','selected','customIk','variance');
-ylabel('Distance [cm]');
-xlabel('Distance [cm]');
-title('2 DoF Spatial Decompostion Plot (FofM)');
+legend('randomXY','workspace','in range','customIk','variance');
+xlabel('X Distance [cm]');
+ylabel('Y Distance [cm]');
+title('2 DoF Spatial Decompostion Work-Space (FofM)');
+
+%% joint space
+fig2 = figure(2);
+scatter(storeThetas1(:,1),storeThetas1(:,2),'b');
+hold on;
+axis equal;
+grid on;
+scatter(storeThetas2(:,1),storeThetas2(:,2),'b');
+scatter(storeClosedThetas1(:,1),storeClosedThetas1(:,2),5,'filled','k');
+scatter(storeClosedThetas2(:,1),storeClosedThetas2(:,2),15,'filled','k');
+legend('custom 1','custom 2','closed 1','closed 2');
+xlabel('t1 angle [deg]');
+ylabel('t2 angle [deg]');
+title('2 DoF Spatial Decompostion Joint-Space (FofM)');

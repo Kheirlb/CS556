@@ -1,34 +1,20 @@
 clear; clc; close all;
 %Authors: Ashley Lacy and Karl Parks
 
-%% Creating foward kinematics robot
-r = 100; %cm r = length 1
-s = r;     % s = length 2
-syms theta1 theta2 rob
-% theta, d, a, alpha
-% link angle, link offset, link length, link twist
-DH = [theta1 0 r 0; theta2 0 s 0]
-rob = SerialLink(DH)
-robfk = rob.fkine([theta1 theta2])
-xEq = robfk.t(1,1);
-yEq = robfk.t(2,1);
-
-disp('created forward kinematics robot')
-
 %% Constraints & Initialization
-n = 25000;
+n = 50000;
 
 %global theta1low theta1high theta2low theta2high deltaTheta deltaCM l1 l2
 setConstraints;
 
-numCellsRow = ceil(170/deltaTheta);
-numCellsCol = ceil(180/deltaTheta);
+numCellsRow = ceil((theta1high-theta1low)/deltaTheta);
+numCellsCol = ceil((theta2high-theta2low)/deltaTheta);
 thetaCountCell = zeros(numCellsRow,numCellsCol);
-rowsXY = ceil(2*(r+s)/deltaCM);
-colsXY = ceil(2*(r+s)/deltaCM);
+rowsXY = ceil(2 *(l1+l2)/deltaCM);
+colsXY = ceil(2 *(l1+l2)/deltaCM);
 xyCell = cell(rowsXY,colsXY);
 
-elementLimit = ceil((n/(numCellsRow*numCellsCol))*1.1);
+elementMin = ceil((n/(numCellsRow*numCellsCol))*1.1);
 
 xArray = [];
 yArray = [];
@@ -41,15 +27,16 @@ for idx = 1:n
     theta2rand = theta2low + (theta2high-theta2low).*rand(1,1);
     theta1Index = ceil(theta1rand/deltaTheta);
     theta2Index = ceil(theta2rand/deltaTheta);%this could end up being a negative number.... then it would not pull correctly from
-    thetaCountCell(theta1Index,theta2Index+9) = thetaCountCell(theta1Index,theta2Index+9) + 1; %here...
+    theta2shift = (theta2high-theta2low)/(2*deltaTheta);
+    thetaCountCell(theta1Index,theta2Index + theta2shift) = thetaCountCell(theta1Index,theta2Index + theta2shift) + 1; %here...
     theta1Array = [theta1Array,theta1rand];
     theta2Array = [theta2Array,theta2rand];
     x = 100*cosd(theta1rand + theta2rand) + 100*cosd(theta1rand);
     y = 100*sind(theta1rand + theta2rand) + 100*sind(theta1rand);
     xArray = [xArray, x];
     yArray = [yArray, y];
-    xIndex = ceil(x/deltaCM) + 20;
-    yIndex = ceil(y/deltaCM) + 20;
+    xIndex = ceil(x/deltaCM) + (l1+l2)/deltaCM;
+    yIndex = ceil(y/deltaCM) + (l1+l2)/deltaCM;
     %2xN Double Array in Each Cell. X is top row, Y is bottom row
     xyCell{xIndex,yIndex} = [xyCell{xIndex,yIndex};[x,y,theta1rand,theta2rand]];
 end
@@ -70,7 +57,7 @@ for rowIdx = 1:rowsXY
             xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(:,:)];
         end
         if numRowsPerCell >= 6
-            idx = kmeans(xyCell{rowIdx,colIdx}(:,1:2),2);
+            idx = kmeans(xyCell{rowIdx,colIdx}(:,1:2),2,'Replicates',25);
             for i = 1:length(idx)
                 if idx(i) == 1
                     xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
@@ -137,6 +124,8 @@ xlim([-200, 200]);
 ylim([-200, 200]);
 grid on
 
+close all;
+testingScriptV2;
 
 %% Saving early work for reference
 % k-mean work, single cell
