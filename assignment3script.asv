@@ -50,7 +50,6 @@ end
 xyCell1 = cell(rowsXY,colsXY);
 xyCell2 = cell(rowsXY,colsXY);
 
-
 coeff = cell(rowsXY,colsXY); %creating primary online array
 
 disp('generated x and y')
