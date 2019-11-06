@@ -11,12 +11,12 @@ xhigh = 200;
 ylow = -200;
 yhigh = 200;
 
-testSize = 500;
-%xTestVec = (xhigh-xlow).*rand(testSize,1) + xlow;
-%yTestVec = (yhigh-ylow).*rand(testSize,1) + ylow;
-%xyVec = [xTestVec, yTestVec];
-xTestVec = xyVec(:,1);
-yTestVec = xyVec(:,2);
+testSize = 100;
+xTestVec = (xhigh-xlow).*rand(testSize,1) + xlow;
+yTestVec = (yhigh-ylow).*rand(testSize,1) + ylow;
+xyVec = [xTestVec, yTestVec];
+% xTestVec = xyVec(:,1);
+% yTestVec = xyVec(:,2);
 
 %show workspace
 L1 = l1;
@@ -52,12 +52,16 @@ storeThetas2 = zeros(1,2);
 storeClosedThetas1 = zeros(1,2);
 storeClosedThetas2 = zeros(1,2);
 
+timeCountVec = [];
+
 for testi = 1:testSize
     x = xTestVec(testi);
     y = yTestVec(testi);
   try
         thetas{testi,1} = [x,y];
-        thetasIk = customIk(x,y);
+        tic;
+        thetasIk = customIK(x,y);
+        timeCountVec = [timeCountVec, toc];
         storeThetas1 = [storeThetas1; thetasIk(1:2)];
         if length(thetasIk) > 2 
             storeThetas2 = [storeThetas2; thetasIk(3:4)];
@@ -122,9 +126,14 @@ scatter(xVar(mark2ans1),yVar(mark2ans1),80,'m','LineWidth',1.25);
 %show points with two answers
 scatter(xVar(mark2ans2),yVar(mark2ans2),170,'k','LineWidth',1.25);
 
+variance_cm = 0;
+variance_cm_vec = zeros(length(xUsed), 1);
 %plot variance using lines
 for iter = 1:length(xUsed)
     plot([xUsed(iter), xVar(iter)],[yUsed(iter), yVar(iter)], 'k')
+    plot([xUsed(iter), xVar(iter)],[yUsed(iter), yVar(iter)], 'k');
+    variance_cm = sqrt((xVar(iter)- xUsed(iter))^2 + (yVar(iter) - yUsed(iter))^2);
+    variance_cm_vec(iter) = variance_cm;
 end
 
 legend('randomXY','workspace','in range','customIk','1st Sol','2nd Sol','variance');
@@ -145,3 +154,8 @@ legend('custom 1','custom 2','closed 1','closed 2');
 xlabel('t1 angle [deg]');
 ylabel('t2 angle [deg]');
 title('2 DoF Spatial Decompostion Joint-Space (FofM)');
+
+%% print statistics
+fprintf('Average Online Computation Time: %0.2f ms\n', mean(timeCountVec)*1000);
+fprintf('Average Variance: %0.2f cm\n', mean(variance_cm_vec));
+fprintf('Max Variance: %0.2f cm\n', max(variance_cm_vec));

@@ -81,26 +81,26 @@ end
 
 disp('completed k-mean for thetas')
 
-for rowIdx = 1:rowsXY
-    for colIdx = 1:colsXY
-        [numRowsPerCell, ~] = size(xyCell{rowIdx,colIdx});
-        if numRowsPerCell > 2 && numRowsPerCell < 6
-            xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(:,:)];
-        end
-        if numRowsPerCell >= 6
-            idx = kmeans(xyCell{rowIdx,colIdx}(:,1:2),2,'Replicates',25);
-            for i = 1:length(idx)
-                if idx(i) == 1
-                    xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
-                else
-                    xyCell2{rowIdx,colIdx} = [xyCell2{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
-                end
-            end
-        end
-    end
-end
-
-disp('completed k-mean for x and y')
+% for rowIdx = 1:rowsXY
+%     for colIdx = 1:colsXY
+%         [numRowsPerCell, ~] = size(xyCell{rowIdx,colIdx});
+%         if numRowsPerCell > 2 && numRowsPerCell < 6
+%             xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(:,:)];
+%         end
+%         if numRowsPerCell >= 6
+%             idx = kmeans(xyCell{rowIdx,colIdx}(:,1:2),2,'Replicates',25);
+%             for i = 1:length(idx)
+%                 if idx(i) == 1
+%                     xyCell1{rowIdx,colIdx} = [xyCell1{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
+%                 else
+%                     xyCell2{rowIdx,colIdx} = [xyCell2{rowIdx,colIdx}; xyCell{rowIdx,colIdx}(i,1:4)];
+%                 end
+%             end
+%         end
+%     end
+% end
+% 
+% disp('completed k-mean for x and y')
 %% linear regression and coefficients
 
 msgT = 'Generating Coeff for Thetas';
@@ -164,46 +164,46 @@ end
 close(myWait);
 disp('completed coefficient generation for thetas')
 
-msgXY = 'Generating Coeff for x and y';
-myWait = waitbar(0,msgXY);
-
-for rowIdx = 1:rowsXY
-    for colIdx = 1:colsXY
-        [numRowsPerCell1, ~] = size(xyCell1{rowIdx,colIdx});
-        if numRowsPerCell1 > 2
-            modelt1 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,3));
-            a = modelt1.Coefficients.Estimate(2);
-            b = modelt1.Coefficients.Estimate(3);
-            c = modelt1.Coefficients.Estimate(1);
-            modelt2 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,4));
-            d = modelt2.Coefficients.Estimate(2);
-            e = modelt2.Coefficients.Estimate(3);
-            f = modelt2.Coefficients.Estimate(1);
-            coeff{rowIdx,colIdx} = [a, b, c;
-                                    d, e, f];
-        end
-        [numRowsPerCell2, ~] = size(xyCell2{rowIdx,colIdx});
-        if numRowsPerCell2 > 2
-            modelt3 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,3));
-            a2 = modelt3.Coefficients.Estimate(2);
-            b2 = modelt3.Coefficients.Estimate(3);
-            c2 = modelt3.Coefficients.Estimate(1);
-            modelt4 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,4));
-            d2 = modelt4.Coefficients.Estimate(2);
-            e2 = modelt4.Coefficients.Estimate(3);
-            f2 = modelt4.Coefficients.Estimate(1);
-
-            secondCoeff = [a2, b2, c2;
-                           d2, e2, f2];
-            coeff{rowIdx,colIdx} = [coeff{rowIdx,colIdx}; secondCoeff];
-        end
-    end
-    waitbar((rowIdx/rowsXY),myWait,msgXY);
-end
-
-close(myWait);
-
-disp('completed coefficient generation for x and y')
+% msgXY = 'Generating Coeff for x and y';
+% myWait = waitbar(0,msgXY);
+% 
+% for rowIdx = 1:rowsXY
+%     for colIdx = 1:colsXY
+%         [numRowsPerCell1, ~] = size(xyCell1{rowIdx,colIdx});
+%         if numRowsPerCell1 > 2
+%             modelt1 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,3));
+%             a = modelt1.Coefficients.Estimate(2);
+%             b = modelt1.Coefficients.Estimate(3);
+%             c = modelt1.Coefficients.Estimate(1);
+%             modelt2 = fitlm(xyCell1{rowIdx,colIdx}(:,1:2),xyCell1{rowIdx,colIdx}(:,4));
+%             d = modelt2.Coefficients.Estimate(2);
+%             e = modelt2.Coefficients.Estimate(3);
+%             f = modelt2.Coefficients.Estimate(1);
+%             coeff{rowIdx,colIdx} = [a, b, c;
+%                                     d, e, f];
+%         end
+%         [numRowsPerCell2, ~] = size(xyCell2{rowIdx,colIdx});
+%         if numRowsPerCell2 > 2
+%             modelt3 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,3));
+%             a2 = modelt3.Coefficients.Estimate(2);
+%             b2 = modelt3.Coefficients.Estimate(3);
+%             c2 = modelt3.Coefficients.Estimate(1);
+%             modelt4 = fitlm(xyCell2{rowIdx,colIdx}(:,1:2),xyCell2{rowIdx,colIdx}(:,4));
+%             d2 = modelt4.Coefficients.Estimate(2);
+%             e2 = modelt4.Coefficients.Estimate(3);
+%             f2 = modelt4.Coefficients.Estimate(1);
+% 
+%             secondCoeff = [a2, b2, c2;
+%                            d2, e2, f2];
+%             coeff{rowIdx,colIdx} = [coeff{rowIdx,colIdx}; secondCoeff];
+%         end
+%     end
+%     waitbar((rowIdx/rowsXY),myWait,msgXY);
+% end
+% 
+% close(myWait);
+% 
+% disp('completed coefficient generation for x and y')
 
 %% saving data
 save('coeff.mat','coeff');
@@ -213,12 +213,20 @@ save('thetaCoeff.mat','thetaCoeff');
 fig1 = figure;
 scatter(theta1Array, theta2Array);
 grid on
+axis equal
+xlabel('t1 angle [deg]');
+ylabel('t2 angle [deg]');
+title('Randomly Generated Joint-Space (t1,t2)');
 
 fig2 = figure;
 scatter(xArray, yArray);
 xlim([-200, 200]);
 ylim([-200, 200]);
 grid on
+axis equal
+xlabel('X Distance [cm]');
+ylabel('Y Distance [cm]');
+title('Work-Space after Forward Kinematics from Randomly Generated Joint-Space');
 
 %%
 %close all;
