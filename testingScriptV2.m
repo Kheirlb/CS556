@@ -1,9 +1,26 @@
+% Description: Testing Script for 2 DoF Decomposition and Approximation 
+%
+% Outputs:
+%     figure 1: workspace
+%     figure 2: jointspace
+%     statistics on variance and time
+%
+% Other m-files required: setConstraints, findxyIndex, customIk,
+% closedIk_v2
+% Subfunctions: none
+% MAT-files required: thrustCoeff.mat
+%
+% Authors: Ashley Lacy and Karl Parks
+% November 2019; Last revision: 11-6-2019
+
+%------------- BEGIN CODE --------------
+
 clear; clc; close all;
 
 %% Initial values
 setConstraints;
-load('storedXY.mat')
-load('xyVec.mat')
+%load('storedXY.mat')
+%load('xyVec.mat')
 
 %% randomly generate points and compare
 xlow = -200;
@@ -33,7 +50,6 @@ for n = theta1low:skip:theta1high
         ySpace = [ySpace, result(2,4)];
     end
 end
-
 
 didNotWork = 0;
 thetas = cell(testSize,3);
@@ -66,9 +82,7 @@ for testi = 1:testSize
         if length(thetasIk) > 2 
             storeThetas2 = [storeThetas2; thetasIk(3:4)];
         end
-        %if checkRangeThetas(thetasIkClosed(1), thetasIkClosed(2))
         thetas{testi,2} = thetasIk;
-        
         
         %compare variance here!!!
         

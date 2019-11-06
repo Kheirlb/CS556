@@ -1,4 +1,22 @@
 function [thetaVector] = closedIk_v2(x,y,l1,l2)
+% Description: Closed Form Solution IK for 2 DoF Decomposition and Approximation 
+%
+% Inputs:
+%     x, y: coordinate
+%     l1, l2: distances
+%
+% Outputs:
+%     thetaVector: 2 or 4 thetas for 1 or 2 solutions
+%
+% Other m-files required: none
+% Subfunctions: none
+% MAT-files required: none
+%
+% Authors: Ashley Lacy and Karl Parks
+% November 2019; Last revision: 11-6-2019
+
+%------------- BEGIN CODE --------------
+
 thetaVector = [];
 
 t2rad1 = acos((x^2 + y^2 - l1^2 - l2^2)/(2*l1*l2));

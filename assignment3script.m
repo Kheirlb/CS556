@@ -1,5 +1,23 @@
+% Description: Offline Script for 2 DoF Decomposition and Approximation 
+%
+% Inputs:
+%     n: number of random variables 
+%
+% Outputs:
+%     thrustCoeff.mat: stored coeff for online IK
+%     figure 1: random jointspace
+%     figure 2: FK workspace
+%
+% Other m-files required: setConstraints, findxyIndex
+% Subfunctions: none
+% MAT-files required: none
+%
+% Authors: Ashley Lacy and Karl Parks
+% November 2019; Last revision: 11-6-2019
+
+%------------- BEGIN CODE --------------
+
 clear; clc; close all;
-%Authors: Ashley Lacy and Karl Parks
 
 %% Constraints & Initialization
 n = 25000;

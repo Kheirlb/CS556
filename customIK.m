@@ -1,4 +1,21 @@
-function [thetaVector] = customIk(x,y)
+function [thetaVector] = customIK(x,y)
+% Description: Custom IK for 2 DoF Decomposition and Approximation 
+%
+% Inputs:
+%     x, y: coordinate
+%
+% Outputs:
+%     thetaVector: 2 or 4 thetas for 1 or 2 solutions
+%
+% Other m-files required: setConstraints, findxyIndex, checkRangeThetas
+% Subfunctions: none
+% MAT-files required: thetaCoeff.mat
+%
+% Authors: Ashley Lacy and Karl Parks
+% November 2019; Last revision: 11-6-2019
+
+%------------- BEGIN CODE --------------
+
 load('thetaCoeff.mat');
 coeff = thetaCoeff;
 thetaVector = [];
